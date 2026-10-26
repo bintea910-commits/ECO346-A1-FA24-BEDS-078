@@ -1,7 +1,7 @@
 # ECO346 Assignment 1 — Education Spending and Literacy
 
 **Student:** Zainab Ashraf  
-**Registration:** FA24-BED-078  
+**Registration:** FA24-BEDS-078  
 **Variant:** 6 — Balochistan Rural
 
 > These tables reproduce the current results saved in the repository's `figures/` CSV files. The repository name uses `FA24-BEDS-078`, so check the official registration spelling before submission.
