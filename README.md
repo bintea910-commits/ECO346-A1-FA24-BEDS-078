@@ -1,121 +1,117 @@
 # ECO346 Assignment 1 — Education Spending and Literacy
 
 **Student:** Zainab Ashraf  
-**Registration number:** FA24-BED-078 *(please confirm against your official university record; repository name currently uses FA24-BEDS-078)*  
-**Assigned variant:** 6 — Balochistan Rural  
-**Course:** ECO346 | **Assignment:** 1
+**Registration:** FA24-BED-078  
+**Variant:** 6 — Balochistan Rural
 
-> **Verification notice:** The survey-weighted figures below were supplied in the assignment discussion, not independently reproduced from the two CSV files in this README preparation. The currently shared `final_code.R` computes household totals for Balochistan without a rural filter, so its output must **not** be presented as validation of Q2. Re-run corrected R scripts and update the figures and numbers before final submission.
+> These tables reproduce the current results saved in the repository's `figures/` CSV files. The repository name uses `FA24-BEDS-078`, so check the official registration spelling before submission.
 
-## Q1 — Repository, data and reproducibility
+## Q1 — Data, scripts and reproducibility
 
-This repository contains the PSLM household and person subsets, analytical code, SVG figures and presentation. Variant 6 selects **Balochistan Rural**. Household variables (including `hhweight`, `prov_code`, and `urban_rural`) should be joined to person records using `hhid` before calculating student-level spending and weighted literacy rates.
+The repository uses `data/pslm_person_subset.csv` and `data/pslm_hh_subset.csv`. For Balochistan Rural, the scripts merge survey weight `hhweight` and area variables from household data by `hhid`, then select `prov_code == 4` and `urban_rural == 1`.
 
-### Files
+**Run in RStudio from the repository root:**
 
-| Location | Purpose |
-|---|---|
-| `data/pslm_hh_subset.csv` | Household information and survey weights |
-| `data/pslm_person_subset.csv` | Individual records, education spending and literacy |
-| `final_code.R` | Existing R script; **requires correction** to meet Q2–Q4 specifications |
-| `scripts/q5_python.py` | Python literacy analysis; **requires weight-merge and missing-value checks** |
-| `figures/` | Exported graphs |
-| `FA24-BED-078.pptx` | Presentation, if this is the uploaded filename |
+```r
+install.packages('ggplot2') # only if not already installed
+source('scripts/01_q2.R')
+source('scripts/02_q3.R')
+source('scripts/03_q4.R')
+```
 
-### Reproducing the analysis
+**Run in a terminal from the same folder:**
 
-1. Clone or download this repository, keeping the `data`, `scripts`, and `figures` folders together.
-2. In RStudio, set the working directory to the repository root and load the two CSV files.
-3. Verify the coding of `prov_code` and `urban_rural` in the household file; restrict to Balochistan Rural, then merge household weights by `hhid`.
-4. For Q2, restrict to **person-level students with `ed_total > 0`**, use valid positive weights, and compute weighted percentiles and the specified weighted histogram.
-5. For Q3, restrict to ages **10–64**, nonmissing `literate` and valid weights; calculate weighted rates for men and women in five-year age bands.
-6. Save R figures as SVG, then run the Python Q5 replication and compare age-band rates with R to one decimal place.
+```bash
+py scripts/04_q5_python.py
+```
 
-**Status:** A complete reproducible R workflow for Q2–Q4 has not yet been verified in this repository.
+Python requires pandas, numpy, and matplotlib. Graphs and results are written to `figures/`. R's Q3 CSV should be created before the Q5 Python check. Confirm the `default.svg` Git commit predates the Q3 redesign commit, as required by the assignment.
 
-## Q2 — Education spending distribution
+## Q2 — Weighted education spending
 
-**Reported survey-weighted results (pending verification against corrected R output):**
+The Q2 R analysis keeps person-level observations with `ed_total > 0` and valid positive household weights. Weighted percentiles use the first sorted expenditure value at which cumulative normalized weight reaches the relevant percentile.
 
-| Indicator | Reported value |
+| Indicator | RStudio result |
 |---|---:|
-| Valid student observations | 1,472 |
-| Weighted 10th percentile (P10) | Rs. 600 |
-| Weighted median (P50) | Rs. 3,500 |
-| Weighted 90th percentile (P90) | Rs. 18,700 |
-| P90 / weighted median | 5.34 |
-| Unweighted median | **Not supplied / needs R calculation** |
-| Excluded observations outside log10 range 2–6 | **Not supplied / needs R calculation** |
+| Student observations | **1,464** |
+| Weighted P10 | **Rs. 600** |
+| Weighted median | **Rs. 3,500** |
+| Unweighted median | **Rs. 3,000** |
+| Weighted P90 | **Rs. 18,700** |
+| P90 / weighted median | **5.34** |
+| Excluded outside log10 range 2–6 | **1** |
 
-The reported 90th-percentile spending is about 5.34 times the median, suggesting substantial variation among students with positive education expenditure. These numbers must be checked using the required person-level sample and household survey weights.
+![Q2 weighted histogram](figures/q2_distribution.svg)
 
-![Q2 education spending distribution](figures/q2_distribution.svg)
+**Interpretation:** The weighted median annual student spending is Rs. 3,500, while the 90th percentile is Rs. 18,700, about 5.34 times as high. This indicates substantial variation among students with positive spending. The histogram uses weighted density per log10 unit, with 0.1-width bins from log10 2 through 6. One observation is excluded from the displayed range, not from the overall percentile calculation.
 
-**Required figure checks:** histogram density **per log10 unit**, bins of width 0.1 from log10 2 to 6, x-axis labels in rupees, and dashed weighted median/P90 lines with rupee labels. The currently stored figure may not yet satisfy all these conditions.
+[Q2 numerical output](figures/q2_results.csv)
 
-## Q3 — Literacy by age and sex
+## Q3 — Weighted literacy by age and gender
 
-**Reported weighted literacy estimates (pending verification against corrected R output):**
+The sample includes persons ages 10–64 with nonmissing literacy and valid survey weights. Sex codes are 1 = Men and 2 = Women. Rates are weighted means multiplied by 100, and `n` values are **unweighted counts**.
 
-| Age band | Male literacy | Female literacy | Male − female gap |
-|---|---:|---:|---:|
-| 15–19 | 63.81% | 33.25% | 30.56 percentage points |
-| 40–44 | 55.42% | 7.50% | **47.92 percentage points** |
-| 55–59 | 39.75% | 3.45% | 36.30 percentage points |
+| Age band | Men n | Men rate | Women n | Women rate |
+|---|---:|---:|---:|---:|
+| 10–14 | 663 | 60.08% | 428 | 40.88% |
+| 15–19 | 477 | 63.81% | 293 | 33.25% |
+| 20–24 | 358 | 61.66% | 307 | 22.77% |
+| 25–29 | 355 | 56.54% | 347 | 24.76% |
+| 30–34 | 297 | 52.93% | 309 | 15.05% |
+| 35–39 | 266 | 53.76% | 252 | 15.04% |
+| 40–44 | 227 | 55.42% | 198 | 7.50% |
+| 45–49 | 181 | 32.70% | 149 | 8.15% |
+| 50–54 | 133 | 26.95% | 111 | 14.95% |
+| 55–59 | 95 | 39.75% | 79 | 3.45% |
+| 60–64 | 93 | 39.84% | 59 | 0.98% |
 
-The **40–44** band was reported as having the largest gender gap across five-year age bands. Men have higher reported literacy than women in the displayed groups. This is a descriptive comparison; age-group differences do not establish a causal effect of age or gender.
+**Requested rates:** ages **15–19**: men **63.81%**, women **33.25%** (gap **30.56 percentage points**). Ages **55–59**: men **39.75%**, women **3.45%** (gap **36.30 percentage points**). The **largest gender gap overall** is ages **40–44**, with men **55.42%**, women **7.50%**, a gap of **47.92 percentage points**.
 
-![Q3 literacy by age and sex](figures/q3_literacy.svg)
+![Q3 weighted literacy](figures/q3_literacy.svg)
 
-### Full Q3 age-band table — completion required
+**Interpretation:** Men's weighted literacy rates exceed women's in every displayed age band. The largest gap is at ages 40–44. These patterns are descriptive and cannot establish that age or gender itself causes literacy differences; differences between cohorts and access to schooling may also matter. The plot uses hollow markers for unweighted cells smaller than 30; none of the current displayed cells is below 30.
 
-The assignment requires **unweighted cell counts and weighted literacy rates for every five-year age band (10–14 through 60–64)**, separately for male and female respondents. Those complete results were not provided, so they cannot be filled accurately here. Add the R-generated full table after checking the correct rural filter and weights. Mark cells with fewer than 30 unweighted observations as thin in the SVG using hollow markers.
+[Complete R age-band table](figures/q3_band_table_R.csv)
 
-## Q4 — Default plot and redesign
+## Q4 — Default graph and redesigned visualization
 
-**Default plot:**
+**Default plot**, produced using exactly `ggplot(data, aes(x, y)) + geom_point()`:
 
-![Q4 default plot](figures/default.svg)
+![Q4 default](figures/default.svg)
 
-**Redesigned plot:**
+**Redesign:** Q3 weighted literacy chart.
 
-![Q4 improved literacy plot](figures/q4_improved.svg)
+![Q4 redesigned Q3 figure](figures/q3_literacy.svg)
 
-The redesign aims to improve comparison through (1) clearer gender distinction, (2) more informative axis and series labels, and (3) explicit emphasis on the age band with the largest gender gap. These changes support readability and visual hierarchy. A default scatterplot may show every observation directly, whereas the redesigned aggregated chart hides individual-level variation. **Verify the final redesigned file actually implements these changes.**
+**Three design improvements:** The redesign summarizes overlapping person-level observations into age-band weighted rates, making comparisons easier. Separate lines, distinct colors and labels near their endpoints clarify the male and female series without a legend. An annotation identifies the largest gender gap; clear axes and a data caption add context. The default scatterplot shows raw individual-level variation that the aggregated redesign hides. These changes support comparison, legibility, and visual hierarchy. **The assignment requires the default graph to have been committed before the redesign; inspect Git history to verify that sequence.**
 
-**Assignment-specific check:** The default plot must be created with exactly `ggplot(data, aes(x, y)) + geom_point()` and committed **before** the redesigned figure. The screenshots alone do not establish this commit sequence.
+## Q5 — Python replication of R literacy analysis
 
-## Q5 — Python replication of Q3
+The Python script reproduces the same household merge, rural filter, age bands, missing-value restrictions, and survey-weighted literacy means as Q3. Comparison of the exported R and Python tables confirms **all 22 sex-by-age-band rates agree to one decimal place**.
 
-![Q5 Python literacy figure](figures/q5_python.svg)
+| Example | R | Python |
+|---|---:|---:|
+| Women ages 15–19 | **33.25%** | **33.25%** |
+| Men ages 15–19 | 63.81% | 63.81% |
+| Women ages 55–59 | 3.45% | 3.45% |
 
-Q5 requires reproducing the **full Q3 age-band literacy table** in Python or Stata, with results agreeing with R to **one decimal place**.
+![Q5 Python replication](figures/q5_python.svg)
 
-| Check | R result | Python result | Status |
-|---|---|---|---|
-| Female literacy, 15–19 | Not verified | Not verified | **Comparison pending** |
-| All age-band rates to 1 decimal | Not verified | Not verified | **Comparison pending** |
+[R output](figures/q3_band_table_R.csv) · [Python output](figures/q5_band_table_python.csv)
 
-The supplied `scripts/q5_python.py` can silently substitute unit weights if it cannot find a weight column. To ensure correct replication, explicitly merge `hhweight` from the household file, filter nonmissing literacy values, confirm rural coding and compare outputs against R. The use of default `groupby` behavior and the need to specify `observed=True` is one potential cross-language setting to document, but the actual observed difference has not been demonstrated.
+**Cross-language setting:** pandas categorical `groupby` behavior may include unused groups depending on the `observed` setting, whereas R factor handling may differ. The scripts use explicit gender and numeric age-band groups and exclude missing literacy in both languages, so rates remain consistent. Setting `observed=True` would make categorical group handling explicit if categoricals were used.
 
 ## Q6 — Presentation
 
-The presentation should show the assigned variant, a comparison of the default and redesigned visualization, and a key finding. **The assignment permits at most four slides.** If the current PowerPoint has five slides (including a Thank You slide), reduce it to four before submission, for example by combining the conclusion and Thank You content on slide four.
+The final presentation should identify Variant 6, show the default and redesigned graph, and explain the main result. **The assignment allows a maximum of four slides.** The current presentation is `FA24-BED-078.pptx` in the repository root; it should be placed in `slides/` and reduced to four slides if it currently contains five. The final slide can combine the conclusion and “Thank You.”
 
-## Reported sample and methodology
+## Submission check
 
-- **Reported rural Balochistan sample:** 1,505 households and 8,463 individuals. Verify these counts after applying the required filters.
-- **Weighting:** Join household `hhweight` to person records on `hhid`; calculate weighted means for literacy.
-- **Weighted percentiles:** Sort valid positive education spending values and choose the first value whose cumulative normalized weight reaches the target probability.
-- **Missing data:** Exclude missing literacy responses and invalid weights. For education spending, follow the positive-spending student definition.
-
-## Submission checklist
-
-- [ ] Correct and rerun R scripts for Q2, Q3 and Q4.
-- [ ] Verify all reported numbers and regenerate matching SVG figures.
-- [ ] Add the full Q3 age-band table and Q2 missing statistics.
-- [ ] Verify R and Python agree to one decimal place for Q5.
-- [ ] Confirm meaningful Git commit history and default-before-redesign sequence.
-- [ ] Confirm official registration number and consistent filenames.
-- [ ] Keep the final presentation within the four-slide limit.
-- [ ] Submit the public GitHub repository URL and required answers through the course form.
+- [x] Q2, Q3 and Q4 R scripts uploaded.
+- [x] Q5 Python script uploaded.
+- [x] Q2 weighted statistics and Q3 full table saved as CSV.
+- [x] Python and R rates agree to one decimal place.
+- [x] SVG figure files uploaded.
+- [ ] Verify Git commit order for default before redesign.
+- [ ] Put final four-slide PowerPoint in `slides/`.
+- [ ] Confirm registration number spelling and Google Form numbers.
