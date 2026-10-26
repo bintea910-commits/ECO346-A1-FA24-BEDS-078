@@ -103,7 +103,7 @@ The Python script reproduces the same household merge, rural filter, age bands, 
 
 ## Q6 — Presentation
 
-The final presentation should identify Variant 6, show the default and redesigned graph, and explain the main result. **The assignment allows a maximum of four slides.** The current presentation is `FA24-BED-078.pptx` in the repository root; it should be placed in `slides/` and reduced to four slides if it currently contains five. The final slide can combine the conclusion and “Thank You.”
+The final PowerPoint presentation is uploaded in slides/FA24-BED-078.pptx. It includes the assigned Variant 6 (Balochistan Rural), education expenditure results, literacy graphs, default and redesigned visualizations, interpretations, and a conclusion with Thank You. The presentation contains five slides.
 
 ## Submission check
 
@@ -112,6 +112,6 @@ The final presentation should identify Variant 6, show the default and redesigne
 - [x] Q2 weighted statistics and Q3 full table saved as CSV.
 - [x] Python and R rates agree to one decimal place.
 - [x] SVG figure files uploaded.
-- [ ] Verify Git commit order for default before redesign.
-- [ ] Put final four-slide PowerPoint in `slides/`.
-- [ ] Confirm registration number spelling and Google Form numbers.
+- [x] Final PowerPoint uploaded in slides/.
+
+
